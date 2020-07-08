@@ -1,6 +1,8 @@
 const User = require('./../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 signToken = user => {
     return jwt.sign({
       iss: process.env.APP_NAME,
@@ -29,13 +31,14 @@ module.exports ={
             });
             const result = await user.save();
             const token = signToken(result);
-            res.cookie('access_token', token, {
-                httpOnly: true
-              });
-            return res.status(201).json({
+            // res.cookie('access_token', token, {
+            //     httpOnly: true
+            //   });
+              return res.status(200).json({
+                token: token,
                 message: 'Auth successful',
                 expireIn: 24*60*60
-            });
+                });
          }
          catch(e){
             return res.status(401).json({ error: e.message});
@@ -54,28 +57,63 @@ module.exports ={
                 throw new Error('Invalid password');
             }
             const token = signToken(existingUser);
-            res.cookie('access_token', token, {
-                httpOnly: true
-              });
-            return res.status(200).json({
+            // res.cookie('access_token', token, {
+            //     httpOnly: true
+            //   });
+              return res.status(200).json({
+                token: token,
                 message: 'Auth successful',
                 expireIn: 24*60*60
-            });
+                });
 
         }catch(e){
             return res.status(401).json({error: e.message});
         }
     },
     googleOAuth: async (req, res, next) => {
-        // Generate token
-        const token = signToken(req.user);
-        res.cookie('access_token', token, {
-            httpOnly: true
-          });
-        return res.status(200).json({
+        try{
+            const idToken = req.body.access_token;
+            if(!idToken || idToken == null || idToken==' '){
+                throw new Error('Empty access_token');
+            }
+            const ticket = await client.verifyIdToken({
+                idToken: idToken,
+                audience: process.env.GOOGLE_CLIENT_ID
+            });
+            if( !ticket.payload.iss || !ticket.payload.iss =='accounts.google.com'){
+                throw new Error('Invalid token');
+            }
+            const profile = ticket.payload;
+            const user = new User({
+                oAuthProvider:'Google',
+                oAuthId:profile.sub,
+                givenName:profile.given_name,
+                familyName: profile.family_name,
+                email: profile.email,
+                picture:profile.picture,
+            });
+            let result;
+            const existingUser = await User.findOne({email:profile.email.value, oAuthProvider:'Google'});
+            if(existingUser)
+            {
+                 result = existingUser;
+            }else{
+                result = await user.save(); 
+            }
+            const token = signToken(result);
+            return res.status(200).json({
+            token: token,
             message: 'Auth successful',
             expireIn: 24*60*60
-        });
+            });
+            }
+            catch(e){
+                return res.status(401).json({error:{
+                    name: 'UnAuthorize',
+                    message: e.message,
+                    text: e.toString()
+                }})
+            }  
       },
     signOut: async (req, res, next) => {
        res.clearCookie('access_token');

@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const {jwtAuth,googleAuth}= require('../config/passport');
+// const {jwtAuth,googleAuth}= require('../config/passport');
 const userController = require('../controllers/auth');
 const { validateBody, schemas } = require('../helpers/validator');
 const {handleError} = require('../helpers/errors');
-
+const jwtAuth = require('../middlewares/JwtAuth');
 
 router.post('/login',validateBody(schemas.loginSchema),userController.signin);
 /**
@@ -39,15 +39,15 @@ router.post('/login',validateBody(schemas.loginSchema),userController.signin);
  *          '401':
  *              description: Authentication Fail
  */
-
-router.post('/google',googleAuth,userController.googleOAuth, handleError);
+// router.get('/google',gmid);
+router.post('/google',userController.googleOAuth);
 /**
  * @swagger
  * /auth/google:
  *  post:
  *      tags: 
  *          - Auth
- *      summary: "User Login in Google Method"
+ *      summary: "User Login in Google Method by sending idToken in request"
  *      description: Google Authentication
  *      consumes: ["application/json"]          
  *      produces: ["application/json"] 
@@ -63,7 +63,7 @@ router.post('/google',googleAuth,userController.googleOAuth, handleError);
  *                access_token: 
  *                  type: "string"               
  *             example:
- *                 access_token: "blahblahblah"
+ *                 access_token: "sent the idtoken"
  *      responses:
  *          '200':
  *              description: Successful respose
@@ -135,7 +135,7 @@ router.get('/logout',userController.signOut);
  *          '401':
  *              description: Authentication Fail
  *    #  security:
- *     # -   api_key: []
+ *     # -   bearerAuth: []
  */
 
 router.get('/currentuser',jwtAuth,(req,res,next)=>{ res.json(req.user); },handleError);
@@ -154,7 +154,7 @@ router.get('/currentuser',jwtAuth,(req,res,next)=>{ res.json(req.user); },handle
  *          '401':
  *              description: Authentication Fail
  *      security:
- *      -   api_key: []
+ *      -   bearerAuth: []
  */
 
 router.get('/failure',(req,res,next)=>{res.status(401).json('Authorization Fail');});

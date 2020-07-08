@@ -2,7 +2,6 @@ require('custom-env').env();
 const http = require('http');
 const debug = require('debug')('node-angular');
 const app = require('./app');
-
 const normalizePort = val =>{
     var port = parseInt(val, 10);
 
@@ -47,6 +46,9 @@ const port = normalizePort(process.env.APP_PORT || "3000");
 app.set("port", port);
 
 const server = http.createServer(app);
+const io = require('socket.io')(server);
+require('./sockets/connected/index')(io);
+
 server.on("error", onError);
 server.on("listening", onListening);
 server.listen(port, console.log(`Server started on Port ${port}`));

@@ -1,5 +1,5 @@
 const passport = require('passport');
-const googleStrategy = require('passport-google-plus-token');
+const googleStrategy = require('passport-google-oauth20').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
 const User = require('../models/user');
@@ -16,8 +16,7 @@ passport.use(new JwtStrategy({
     // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     jwtFromRequest: cookieExtractor,
     secretOrKey: process.env.JWT_SECRET || 'secret_this_should_be_longer',
-    passReqToCallback: true
-  }, async (req, payload, done) => {
+   }, async (req, payload, done) => {
     try {
       // Find the user specified in token
       console.log(payload.sub);
@@ -38,12 +37,15 @@ passport.use(new JwtStrategy({
   }));
 
 
-passport.use('googleToken',
+passport.use(
     new googleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret:process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL:'/auth/google',
         passReqToCallback: true,
-    }, async (accessToken, refreshToken, profile, cb)=>{
+    }, async (req,accessToken, refreshToken, profile, cb)=>{
+        console.log('req',req);
+        console.log('req',accessToken);
         if(!profile)
         {
           return res.status(401).json('Authorization Fail');
@@ -85,5 +87,5 @@ passport.use('googleToken',
 
 
 const jwtAuth = passport.authenticate('jwt',{session:false, failWithError: true});
-const googleAuth = passport.authenticate('googleToken',{session:false, failWithError: true});
+const googleAuth = passport.authenticate('google',{session:false, failWithError: true});
 module.exports = {passport,jwtAuth,googleAuth};

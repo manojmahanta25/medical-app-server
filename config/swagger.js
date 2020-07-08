@@ -73,17 +73,18 @@ const swaggerOptions= {
             }
          },
          securityDefinitions: {
-            api_key:{
-                type: "apiKey",
-                name: "access_token",
-                in: "cookie"
-            },
-            // bearerAuth: {
-            //     type: 'apiKey',
-            //     name: 'Authorization',
-            //     scheme: 'bearer',
-            //     in: 'header',
+            // api_key:{
+            //     type: "apiKey",
+            //     name: "access_token",
+            //     in: "cookie"
             // },
+            bearerAuth: {
+                type: 'apiKey',
+                name: 'Authorization',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+                in: 'header' 
+            },
         },        
      },
      apis: ['./routes/*.js']

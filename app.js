@@ -7,8 +7,10 @@ const userRoutes = require('./routes/auth');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require('./config/swagger');
-
-
+const io = require('socket.io-client'); 
+const helmet = require("helmet");
+const googleauth = require('./middlewares/google-auth')
+app.use(helmet());
 app.use(cookieParser());
 
 app.use(morgan("dev"));
@@ -25,8 +27,14 @@ app.use((req, res, next)=>{
     }
     next();
 });
-app.use('/api-doc',swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
+app.post('/testing',googleauth,(req,res,next)=>{
+    res.json({message:'success', user: req.payload})
+});
+app.use('/api-doc',swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+app.use('/test',(req,res,next)=>{
+    res.sendFile(__dirname + '/index.html');
+});
 app.use('/auth',userRoutes);
 app.get('/',(req,res,next)=>{
     res.json('hello');
