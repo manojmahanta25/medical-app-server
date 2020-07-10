@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use('/static', express.static(path.join('static')));
+app.use(express.static(path.join('static')));
 app.use((req, res, next)=>{
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
@@ -30,9 +30,9 @@ app.use((req, res, next)=>{
     }
     next();
 });
-app.get('/',(req,res,next)=>{
-    res.sendFile(__dirname + '/static/index.html');
-});
+// app.get('/',(req,res,next)=>{
+//     res.sendFile(__dirname + '/static/index.html');
+// });
 app.get('/api/test', (req, res) => {
     res.json({
       headers: req.headers,
