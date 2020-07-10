@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(express.static(path.join('static')));
+app.use('/static', express.static(path.join('static')));
 app.use((req, res, next)=>{
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
@@ -30,18 +30,19 @@ app.use((req, res, next)=>{
     }
     next();
 });
-// app.get('/',(req,res,next)=>{
-//     res.sendFile(__dirname + '/static/index.html');
-// });
+app.get('/',(req,res,next)=>{
+    res.sendFile(__dirname + '/static/index.html');
+});
 app.get('/api/test', (req, res) => {
     res.json({
       headers: req.headers,
       address: req.connection.remoteAddress
     });
   });
-  const name = process.env.APP_NAME;
+  
   app.get('/api/name', (req, res) => {
-    res.json({ name });
+    let name = process.env.APP_NAME;
+    res.json({ name:name });
   });
   app.get('/api/info', (req, res) => {
     fs.readFile(`${__dirname}/version.txt`, 'utf8', (err, version) => {
