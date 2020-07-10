@@ -55,6 +55,8 @@ app.set("port", port);
 
 const server = http.createServer(app);
 const io = require('socket.io')(server);
+const redis = require('socket.io-redis');
+io.adapter(redis({ host: process.env.APP_PROXY_HOST, port: 6379 }));
 require('./sockets/connected/index')(io);
 server.on("error", onError);
 server.on("listening", onListening);
