@@ -1,9 +1,15 @@
-require('custom-env').env();
 const http = require('http');
 const debug = require('debug')('node-angular');
 const app = require('./app');
 const parseArgs = require('minimist');
 const args = parseArgs(process.argv.slice(2));
+const { name = 'default', porta = null} = args;
+if(name=='default'){
+    require('custom-env').env('dev');
+}else{
+    require('custom-env').env('staging');
+}
+
 const normalizePort = val =>{
     var port = parseInt(val, 10);
 
@@ -44,7 +50,7 @@ const onListening = () => {
     const bind = typeof addr === "string" ? "pipe " + addr: "port " + port;
     debug("Listening on" + bind);
 };
-const { name = process.env.APP_NAME, porta = '3000'} = args;
+
 const port = normalizePort( porta || process.env.APP_PORT );
 app.set("port", port);
 
@@ -61,5 +67,5 @@ server.listen(port, process.env.APP_PROXY_HOST, (err) => {
   
     console.log(`Node [${name}]  listens on http://${process.env.APP_PROXY_HOST}:${port}.`);
   });
-  module.exports={name, port};
+ 
   
