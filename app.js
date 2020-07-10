@@ -16,7 +16,6 @@ const helmet = require("helmet");
 const googleauth = require('./middlewares/google-auth')
 app.use(helmet());
 app.use(cookieParser());
-
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
