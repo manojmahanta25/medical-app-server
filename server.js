@@ -9,7 +9,6 @@ if(name=='default'){
 }else{
     require('custom-env').env('staging');
 }
-
 const normalizePort = val =>{
     var port = parseInt(val, 10);
 
