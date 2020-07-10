@@ -44,15 +44,15 @@ app.get('/api/test', (req, res) => {
   app.get('/api/name', (req, res) => {
     res.json({ name });
   });
-//   app.get('/api/info', (req, res) => {
-//     fs.readFile(`${__dirname}/version.txt`, 'utf8', (err, version) => {
-//       res.json({
-//         version: version || 0,
-//         dirname: __dirname,
-//         cwd: process.cwd()
-//       });
-//     });
-//   });
+  app.get('/api/info', (req, res) => {
+    fs.readFile(`${__dirname}/version.txt`, 'utf8', (err, version) => {
+      res.json({
+        version: version || 0,
+        dirname: __dirname,
+        cwd: process.cwd()
+      });
+    });
+  });
 app.use('/api-doc',swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use('/auth',userRoutes);
 app.use('/graphql', graphqlHttp({
