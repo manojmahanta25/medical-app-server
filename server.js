@@ -51,4 +51,12 @@ require('./sockets/connected/index')(io);
 
 server.on("error", onError);
 server.on("listening", onListening);
-server.listen(port, console.log(`Server started on Port ${port}`));
+server.listen(port, process.env.APP_PROXY_HOST, (err) => {
+    if (err) {
+      console.log(err.stack);
+      return;
+    }
+  
+    console.log(`Node [${process.env.APP_NAME}]  listens on http://${process.env.APP_PROXY_HOST}:${port}.`);
+  });
+  

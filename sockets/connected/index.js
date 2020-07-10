@@ -9,6 +9,11 @@ module.exports = (io)=> {
       connections.push(socket);
     }
     console.log('Connected: %s socket connected', connections.length);
+    socket.on('heartbeat', (payload) => {
+      payload.nodeName = process.env.APP_NAME;
+      socket.emit('heartbeat', payload);
+    });
+    
     socket.on('disconnect',  (data) => {
         users.splice(users.indexOf(socket.username), 1);
         // updateUsernames();
