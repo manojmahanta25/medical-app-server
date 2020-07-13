@@ -1,14 +1,10 @@
 const http = require('http');
+require('custom-env').env('dev');
 const debug = require('debug')('node-angular');
 const app = require('./app');
 const parseArgs = require('minimist');
 const args = parseArgs(process.argv.slice(2));
 const { name = 'default', porta = null} = args;
-if(name=='default'){
-    require('custom-env').env('dev');
-}else{
-    require('custom-env').env('staging');
-}
 const normalizePort = val =>{
     var port = parseInt(val, 10);
 
