@@ -1,5 +1,5 @@
 const http = require('http');
-require('custom-env').env('dev');
+require('custom-env').env('staging');
 const debug = require('debug')('node-angular');
 const app = require('./app');
 const parseArgs = require('minimist');
